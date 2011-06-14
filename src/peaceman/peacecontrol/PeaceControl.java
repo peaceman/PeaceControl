@@ -6,15 +6,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import peaceman.peacecontrol.command.CommandBase;
+import peaceman.peacecontrol.user.UserManager;
 
 /**
  *
  * @author peaceman
  */
 public class PeaceControl extends JavaPlugin {
-    private final SessionFactory sessionFactory;
+    public final SessionFactory sessionFactory;
 	public final static double version = 0.1;
 	public final MyLogger log = new MyLogger();
+	public final UserManager userManager = new UserManager(this);
     
     public PeaceControl() {
         this.sessionFactory = this.buildSessionFactory();
@@ -52,6 +54,7 @@ public class PeaceControl extends JavaPlugin {
 		} catch (Exception ex) {
 			this.log.error("Catched Exception while executing command " + command.getName());
 			this.log.error(ex.toString());
+			ex.printStackTrace();
 		}
 		return false;
 	}

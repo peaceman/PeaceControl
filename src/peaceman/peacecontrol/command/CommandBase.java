@@ -13,7 +13,7 @@ import peaceman.peacecontrol.PeaceControl;
  * @author Naegele.Nico
  */
 abstract public class CommandBase {
-	private final PeaceControl plugin;
+	protected final PeaceControl plugin;
 	
 	public CommandBase(PeaceControl plugin) {
 		this.plugin = plugin;

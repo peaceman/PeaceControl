@@ -10,6 +10,6 @@
         <property name="username" />
         <property name="passhash" />
         <property name="email" />
-        <property name="registeredAt" column="registered_at" type="timestamp" />
+        <property name="registeredAt" column="registered_at" />
     </class>
 </hibernate-mapping>
