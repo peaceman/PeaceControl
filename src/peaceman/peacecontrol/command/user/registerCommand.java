@@ -47,11 +47,13 @@ public class registerCommand extends CommandBase {
 			return true;
 		}
 		
-		this.plugin.userManager.createUser(username, password, email);
+		if (this.plugin.userManager.createUser(username, password, email)) {
+			sender.sendMessage("Successfully created the user " + username);
+		}
 		return true;
 	}
 	
-	private boolean handleCommandFromPlayer(Player sender, Command command, String commandLabel, String[] args) {
+	private boolean handleCommandFromPlayer(Player sender, Command command, String commandLabel, String[] args) throws Exception {
 		if (args.length < 1) {
 			// at least a password is needed
 			return false;
@@ -63,13 +65,14 @@ public class registerCommand extends CommandBase {
 		}
 		
 		if (this.isUserRegistered(sender, email)) {
-			sender.sendMessage("A user with this name is already registered");
+			sender.sendMessage("You are already registered");
 			return true;
 		}
 		
 		boolean result = this.plugin.userManager.createUser(sender, password, email);
 		if (result == true) {
 			this.plugin.userManager.loginUser(sender);
+			sender.sendMessage("Successfully registered");
 		}
 		return true;
 	}

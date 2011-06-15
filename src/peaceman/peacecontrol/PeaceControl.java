@@ -13,14 +13,10 @@ import peaceman.peacecontrol.user.UserManager;
  * @author peaceman
  */
 public class PeaceControl extends JavaPlugin {
-    public final SessionFactory sessionFactory;
+    public SessionFactory sessionFactory;
 	public final static double version = 0.1;
 	public final MyLogger log = new MyLogger();
 	public final UserManager userManager = new UserManager(this);
-    
-    public PeaceControl() {
-        this.sessionFactory = this.buildSessionFactory();
-    }
     
     private final SessionFactory buildSessionFactory() {
         try {
@@ -33,11 +29,13 @@ public class PeaceControl extends JavaPlugin {
 	
     @Override
     public void onEnable() {
+		this.sessionFactory = this.buildSessionFactory();
         this.log.info("PeaceControl v" + PeaceControl.version + " has been enabled.");
     }
 
     @Override
     public void onDisable() {
+		this.sessionFactory.close();
         this.log.info("PeaceControl has been disabled");
     }
 
