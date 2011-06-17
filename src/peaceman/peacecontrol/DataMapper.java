@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  *
@@ -74,8 +76,38 @@ public abstract class DataMapper {
 		StringBuilder sb = new StringBuilder();
 		sb.append("UPDATE ");
 		sb.append(this.tableName).append(" SET ");
+		Queue<Object> newValues = new ArrayBlockingQueue<Object>(changedValues.size());
 		
-		sb.append(DataMapper.implodeStringArray(changedValues.keySet()));
+		Iterator<Map.Entry<String, Object[]>> iter = changedValues.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<String, Object[]> entry = iter.next();
+			Object[] values = entry.getValue();
+			
+			sb.append(entry.getKey())
+					.append(" = ")
+					.append(this.determineSqlPlaceholder((Class)values[0]));
+			
+			if (iter.hasNext()) {
+				sb.append(", ");
+			}
+			
+			newValues.add(values[1]);
+		}
+		
+		sb.append(" WHERE id = %i");
+		newValues.add(value.getId());
+		
+		PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+		int counter = 1;
+		
+		Object tmpObject = null;		
+		while (!newValues.isEmpty()) {
+			tmpObject = newValues.poll();
+			stmt.setObject(counter, tmpObject);
+			counter++;
+		}
+		
+		
 	}
 	
 	private char determineSqlPlaceholder(Class type) {

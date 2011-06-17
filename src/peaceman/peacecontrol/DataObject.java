@@ -90,4 +90,8 @@ public abstract class DataObject {
 			}
 		}
 	}
+
+	public long getId() {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
 }
