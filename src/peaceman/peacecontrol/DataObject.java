@@ -1,6 +1,7 @@
 package peaceman.peacecontrol;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,13 @@ public abstract class DataObject {
         for (Field field : fieldArray) {
             if (field.getName().startsWith("_")) {
                 try {
-                    dataFields.put(field.getName().substring(1), field.get(this));
-                } catch (IllegalAccessException e) {
+                    StringBuilder sb = new StringBuilder(field.getName().substring(1));
+                    sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                    Method accessMethod = this.getClass().getMethod("get" + sb.toString());
+                    Object result = accessMethod.invoke(this, null);
+                    
+                    dataFields.put(sb.toString(), result);
+                } catch (Exception e) {
                     System.err.println("An error occured while exporting data from a dataobject");
                     e.printStackTrace();
                 }

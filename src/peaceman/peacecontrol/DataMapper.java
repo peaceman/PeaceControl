@@ -85,8 +85,7 @@ public abstract class DataMapper {
 			
 			sb.append(entry.getKey())
 					.append(" = ")
-                    .append("%")
-					.append(this.determineSqlPlaceholder((Class)values[0]));
+                    .append("?");
 			
 			if (iter.hasNext()) {
 				sb.append(", ");
@@ -95,7 +94,7 @@ public abstract class DataMapper {
 			newValues.add(values[1]);
 		}
 		
-		sb.append(" WHERE id = %i");
+		sb.append(" WHERE id = ?");
 		newValues.add(value.getId());
 		try {
             PreparedStatement stmt = this.db.prepareStatement(sb.toString());
@@ -121,15 +120,15 @@ public abstract class DataMapper {
 	
 	private char determineSqlPlaceholder(Class type) {
 		try {
-			if (type.equals(Class.forName("String"))) {
+			if (type.getName().equals("java.lang.String")) {
 				return 's';
 			}
 
-			if (type.equals(Class.forName("Integer"))) {
+			if (type.getName().equals("int")) {
 				return 'i';
 			}
 
-			if (type.equals(Class.forName("Long"))) {
+			if (type.getName().equals("long")) {
 				return 'i';
 			}
 		} catch (Exception e) {
@@ -138,7 +137,7 @@ public abstract class DataMapper {
 		return 's';
 	}
 
-	private void insertDataObject(DataObject value) {
+	public void insertDataObject(DataObject value) {
         Map<String, Object> attributes = value.getData();
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ")
@@ -152,8 +151,7 @@ public abstract class DataMapper {
         Iterator<Object> iter = attributes.values().iterator();
         while (iter.hasNext()) {
             Object tmpObject = iter.next();
-            sb.append("%");
-            sb.append(this.determineSqlPlaceholder(tmpObject.getClass()));
+            sb.append('?');
             if (iter.hasNext()) {
                 sb.append(", ");
             }

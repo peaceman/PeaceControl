@@ -25,6 +25,6 @@ public class User extends DataObject {
     }
     
     public void setPasshash(String passhash) {
-        this._username = passhash;
+        this._passhash = passhash;
     }
 }
