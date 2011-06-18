@@ -14,6 +14,7 @@ import java.util.logging.Logger;
  */
 public abstract class DataObject {
 	protected List<String> changedFields = new ArrayList<String>();
+    protected long _id;
 	
 	public boolean isChanged() {
 		if (this.changedFields.isEmpty())
@@ -41,6 +42,23 @@ public abstract class DataObject {
 		
 		return updatedFieldValues;
 	}
+    
+    public Map<String, Object> getData() {
+        Map<String, Object> dataFields = new HashMap<String, Object>();
+        Field[] fieldArray = this.getClass().getDeclaredFields();
+        
+        for (Field field : fieldArray) {
+            if (field.getName().startsWith("_")) {
+                try {
+                    dataFields.put(field.getName().substring(1), field.get(this));
+                } catch (IllegalAccessException e) {
+                    System.err.println("An error occured while exporting data from a dataobject");
+                    e.printStackTrace();
+                }
+            }
+        }
+        return dataFields;
+    }
 	
 	public void resetChangedFields() {
 		this.changedFields.clear();
@@ -92,6 +110,10 @@ public abstract class DataObject {
 	}
 
 	public long getId() {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return this._id;
 	}
+    
+    public void setId(long id) {
+        this._id = id;
+    }
 }

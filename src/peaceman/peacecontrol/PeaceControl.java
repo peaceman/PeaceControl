@@ -1,41 +1,31 @@
 package peaceman.peacecontrol;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import peaceman.peacecontrol.command.CommandBase;
-import peaceman.peacecontrol.user.UserManager;
 
 /**
  *
  * @author peaceman
  */
 public class PeaceControl extends JavaPlugin {
-    public SessionFactory sessionFactory;
-	public final static double version = 0.1;
-	public final MyLogger log = new MyLogger();
-	public final UserManager userManager = new UserManager(this);
-    
-    private final SessionFactory buildSessionFactory() {
-        try {
-            return new Configuration().configure().buildSessionFactory();
-        } catch (Throwable ex) {
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
+    public final static double version = 0.1;
+    public final MyLogger log = new MyLogger();
+    public final UserManager userManager = new UserManager();
 	
     @Override
     public void onEnable() {
-		this.sessionFactory = this.buildSessionFactory();
         this.log.info("PeaceControl v" + PeaceControl.version + " has been enabled.");
     }
 
     @Override
     public void onDisable() {
-		this.sessionFactory.close();
         this.log.info("PeaceControl has been disabled");
     }
 
@@ -56,4 +46,19 @@ public class PeaceControl extends JavaPlugin {
 		}
 		return false;
 	}
+    
+    public static void main(String[] args) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String url = "jdbc:mysql://localhost:3306/pc";
+            Connection con = DriverManager.getConnection(url, "root", "loladin");
+            
+            UserMapper userMapper = new UserMapper(con);
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

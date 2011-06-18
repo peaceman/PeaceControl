@@ -85,6 +85,7 @@ public abstract class DataMapper {
 			
 			sb.append(entry.getKey())
 					.append(" = ")
+                    .append("%")
 					.append(this.determineSqlPlaceholder((Class)values[0]));
 			
 			if (iter.hasNext()) {
@@ -96,16 +97,24 @@ public abstract class DataMapper {
 		
 		sb.append(" WHERE id = %i");
 		newValues.add(value.getId());
-		
-		PreparedStatement stmt = this.db.prepareStatement(sb.toString());
-		int counter = 1;
-		
-		Object tmpObject = null;		
-		while (!newValues.isEmpty()) {
-			tmpObject = newValues.poll();
-			stmt.setObject(counter, tmpObject);
-			counter++;
-		}
+		try {
+            PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+            int counter = 1;
+
+            Object tmpObject = null;		
+            while (!newValues.isEmpty()) {
+                tmpObject = newValues.poll();
+                stmt.setObject(counter, tmpObject);
+                counter++;
+            }
+            
+            int updatedRows = stmt.executeUpdate();
+            value.resetChangedFields();
+            System.out.printf("Updated %i rows with query %s", updatedRows, sb.toString());
+        } catch (SQLException e) {
+            System.err.println("An error occured while preparing a sql query");
+            e.printStackTrace();
+        }
 		
 		
 	}
@@ -130,7 +139,47 @@ public abstract class DataMapper {
 	}
 
 	private void insertDataObject(DataObject value) {
-		throw new UnsupportedOperationException("Not yet implemented");
+        Map<String, Object> attributes = value.getData();
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ")
+                .append(this.tableName)
+                .append(" (")
+                .append(this.implodeStringArray(attributes.keySet()))
+                .append(") VALUES (");
+        
+        Queue values = new ArrayBlockingQueue<Object>(attributes.size() );
+        
+        Iterator<Object> iter = attributes.values().iterator();
+        while (iter.hasNext()) {
+            Object tmpObject = iter.next();
+            sb.append("%");
+            sb.append(this.determineSqlPlaceholder(tmpObject.getClass()));
+            if (iter.hasNext()) {
+                sb.append(", ");
+            }
+            values.add(tmpObject);
+        }
+        sb.append(")");
+        
+        try {
+            PreparedStatement stmt = this.db.prepareStatement(sb.toString());        
+            int counter = 1;
+            while (!values.isEmpty()) {
+                Object tmpObject = values.poll();
+                stmt.setObject(counter, tmpObject);
+                counter++;
+            }
+            int affectedRows = stmt.executeUpdate();
+            
+            if (affectedRows != 0) {
+                ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID() AS id");
+                rs.next();
+                value.setId(rs.getLong("id"));
+            }
+        } catch (SQLException e) {
+            System.err.println("An error occured while inserting a dataobject");
+            e.printStackTrace();
+        }
 	}
 	
 	public static String implodeStringArray(Collection<String> strings) {
