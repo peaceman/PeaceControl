@@ -1,5 +1,6 @@
 package peaceman.peacecontrol;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +8,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,6 +25,7 @@ public abstract class DataMapper {
 	protected String tableName;
 	protected Connection db;
 	protected Class<? extends DataObject> dataObjectType;
+    protected Map<String, PreparedStatement> statements = new HashMap<String, PreparedStatement>();
 	
 	public DataMapper(Connection db, String tableName, Class dataObjectType) {
 		this.db = db;
@@ -36,18 +41,24 @@ public abstract class DataMapper {
 			
 			if (result.next()) {
 				Map<String, Object> attributes = new HashMap<String, Object>();
-				Map<String, Class> dataFields = DataObject.getDataFieldsByDataObjectClass(this.dataObjectType);
-				
-				for (Map.Entry<String, Class> entry : dataFields.entrySet()) {
-					attributes.put(entry.getKey(), entry.getValue().cast(result.getObject(entry.getKey())));
-				}
+				List<Field> dataFields = new LinkedList<Field>();
+                DataObject.getDataFields(dataFields, this.dataObjectType);
+                
+				for (Field field : dataFields) {
+                    String fieldName = field.getName().substring(1);
+                    attributes.put(fieldName, result.getObject(fieldName));
+                }
 				
 				DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
 				tmpObject.publicate(attributes);
+                
+                if (!this.persistantCache.containsKey(tmpObject.getId()))
+                    this.persistantCache.put(id, tmpObject);
+                
 				return tmpObject;
 			}
 		} catch (SQLException e) {
-			System.out.printf("Couldn't get a row with id %i from table %s\n", id, this.tableName);
+			System.out.printf("Couldn't get a row with id %d from table %s\n", id, this.tableName);
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -56,8 +67,41 @@ public abstract class DataMapper {
 	}
 
 	private PreparedStatement getStatement(String string) {
-		throw new UnsupportedOperationException("Not yet implemented");
+        if (this.statements.containsKey(string)) {
+            return this.statements.get(string);
+        }
+        
+        return this.prepareStatement(string);
 	}
+    
+    private PreparedStatement prepareStatement(String string) {
+        StringBuilder sb = new StringBuilder();
+        if (string.equals("byId")) {
+            List<Field> dataFields =  new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            
+            List<String> dataFieldNames = new LinkedList<String>();
+            ListIterator<Field> iter = dataFields.listIterator();
+            while (iter.hasNext()) {
+                dataFieldNames.add(iter.next().getName().substring(1));
+            }
+            
+            sb.append("SELECT ")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(" FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE id = ?");
+        }
+        
+        try {
+            PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+            return stmt;
+        } catch (SQLException e) {
+            System.err.println("An error occurred while preparing a statement");
+            e.printStackTrace();
+            return null;
+        }
+    }
 	
 	public void persistCaches() {
 		for (Map.Entry<Long, DataObject> entry : this.persistantCache.entrySet()) {
@@ -76,7 +120,7 @@ public abstract class DataMapper {
 		StringBuilder sb = new StringBuilder();
 		sb.append("UPDATE ");
 		sb.append(this.tableName).append(" SET ");
-		Queue<Object> newValues = new ArrayBlockingQueue<Object>(changedValues.size());
+		Queue<Object> newValues = new ArrayBlockingQueue<Object>(changedValues.size() + 1);
 		
 		Iterator<Map.Entry<String, Object[]>> iter = changedValues.entrySet().iterator();
 		while (iter.hasNext()) {
@@ -109,13 +153,11 @@ public abstract class DataMapper {
             
             int updatedRows = stmt.executeUpdate();
             value.resetChangedFields();
-            System.out.printf("Updated %i rows with query %s", updatedRows, sb.toString());
+            System.out.printf("Updated %d rows with query %s\n", updatedRows, sb.toString());
         } catch (SQLException e) {
             System.err.println("An error occured while preparing a sql query");
             e.printStackTrace();
-        }
-		
-		
+        }		
 	}
 	
 	private char determineSqlPlaceholder(Class type) {

@@ -29,7 +29,8 @@ public abstract class DataObject {
 		Class <? extends DataObject> runtimeClass = this.getClass();
 		for (String fieldName : this.changedFields) {
 			try {
-				Field tmpField = runtimeClass.getField("_" + fieldName);
+				Field tmpField = runtimeClass.getDeclaredField("_" + fieldName);
+                tmpField.setAccessible(true);
 				Object fieldValue = tmpField.get(this);
 				
 				Object[] fieldData = new Object[2];
@@ -85,35 +86,45 @@ public abstract class DataObject {
 			return null;
 		}
 	}
-	
-	public Map<String, Class> getDataFields() {
-		return DataObject.getDataFieldsByDataObjectClass(this.getClass());
-	}
-	
-	public static Map<String, Class> getDataFieldsByDataObjectClass(Class dataObjectClass) {
-		Map<String, Class> fields = new HashMap<String, Class>();
-		
-		Field[] fieldArray = dataObjectClass.getDeclaredFields();
-		for (Field field : fieldArray) {
-			if (field.getName().startsWith("_")) {
-				fields.put(field.getName().substring(1), field.getType());
-			}
-		}
-		
-		return fields;
-	}
+    
+    public static List<Field> getDataFields(List<Field> fields, Class<?> type) {
+        for (Field field: type.getDeclaredFields()) {
+            if (field.getName().startsWith("_"))
+                fields.add(field);
+        }
+
+        if (type.getSuperclass() != null) {
+            fields = getDataFields(fields, type.getSuperclass());
+        }
+
+        return fields;
+    }
 
 	public void publicate(Map<String, Object> attributes) {
 		Class runtimeClass = this.getClass();
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			try {
-				Field tmpField  = runtimeClass.getField("_" + entry.getKey());
+                Field tmpField = DataObject.getField("_" + entry.getKey(), runtimeClass);
+                tmpField.setAccessible(true);
 				tmpField.set(this, entry.getValue());
 			} catch (Exception ex) {
 				Logger.getLogger(DataObject.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
+    
+    public static Field getField(String name, Class<?> type) {
+        try {
+            return type.getDeclaredField(name);
+        } catch (NoSuchFieldException ex) {
+            if (type.getSuperclass() != null) {
+                return getField(name, type.getSuperclass());
+            }
+        } catch (SecurityException ex) {
+            Logger.getLogger(DataObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 
 	public long getId() {
 		return this._id;

@@ -54,13 +54,17 @@ public class PeaceControl extends JavaPlugin {
 
             UserMapper userMapper = new UserMapper(con);
             
-            User newUser = new User();
-            newUser.setUsername("test");
-            newUser.setPasshash("test123");
+//            User newUser = new User();
+//            newUser.setUsername("test");
+//            newUser.setPasshash("test123");
+//            
+//            userMapper.insertDataObject(newUser);
+//            
+//            System.out.println("Id of the new user " + newUser.getId());
             
-            userMapper.insertDataObject(newUser);
-            
-            System.out.println("Id of the new user " + newUser.getId());
+            User user = (User)userMapper.getById(1);
+            user.setUsername("lol");
+            userMapper.persistCaches();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
