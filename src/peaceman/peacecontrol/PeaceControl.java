@@ -62,9 +62,14 @@ public class PeaceControl extends JavaPlugin {
 //            
 //            System.out.println("Id of the new user " + newUser.getId());
             
-            User user = (User)userMapper.getById(1);
+            User user = (User)userMapper.getById(3);
             user.setUsername("lol");
-            userMapper.persistCaches();
+            
+            User newUser = new User();
+            newUser.setUsername("newUser");
+            newUser.setPasshash("omgwaseinhash");
+            
+            userMapper.insertDataObject(newUser);
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
