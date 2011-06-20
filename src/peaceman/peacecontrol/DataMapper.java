@@ -22,7 +22,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public abstract class DataMapper {
 
     protected Map<Long, DataObject> persistantCache = new HashMap<Long, DataObject>();
-    protected Map<Long, DataObject> newCache = new HashMap<Long, DataObject>();
+    protected Map<Integer, DataObject> newCache = new HashMap<Integer, DataObject>();
     protected String tableName;
     protected Connection db;
     protected Class<? extends DataObject> dataObjectType;
@@ -55,10 +55,8 @@ public abstract class DataMapper {
 
                 DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
                 tmpObject.publicate(attributes);
-
-                if (!this.persistantCache.containsKey(tmpObject.getId())) {
-                    this.persistantCache.put(id, tmpObject);
-                }
+                
+                this.addToPersistantCache(tmpObject);
 
                 return tmpObject;
             }
@@ -81,9 +79,8 @@ public abstract class DataMapper {
 
     protected void addToNewCache(DataObject dataObject) {
         if (dataObject.getId() == 0) {
-            long key = dataObject.hashCode();
-            if (!this.newCache.containsKey(key)) {
-                this.newCache.put(key, dataObject);
+            if (!this.newCache.containsKey(dataObject.hashCode())) {
+                this.newCache.put(dataObject.hashCode(), dataObject);
             }
         }
     }
@@ -97,21 +94,29 @@ public abstract class DataMapper {
     }
 
     protected void removeFromNewCache(DataObject dataObject) {
-        long key = dataObject.hashCode();
-        if (this.newCache.containsKey(key)) {
-            this.newCache.remove(key);
+        if (this.newCache.containsKey(dataObject.hashCode())) {
+            this.newCache.remove(dataObject.hashCode());
         }
     }
 
-    private PreparedStatement getStatement(String string) {
+    protected PreparedStatement getStatement(String string) {
         if (this.statements.containsKey(string)) {
             return this.statements.get(string);
         }
 
         return this.prepareStatement(string);
     }
+    
+    public boolean forceInsert(DataObject dataObject ) {
+        if (dataObject.getId() == 0) {
+            if (this.newCache.containsKey(dataObject.hashCode())) {
+                return this.insertDataObject(dataObject);
+            }
+        }
+        return false;
+    }
 
-    private PreparedStatement prepareStatement(String string) {
+    protected PreparedStatement prepareStatement(String string) {
         StringBuilder sb = new StringBuilder();
         if (string.equals("byId")) {
             List<Field> dataFields = new LinkedList<Field>();
@@ -169,7 +174,7 @@ public abstract class DataMapper {
             }
         }
 
-        for (Map.Entry<Long, DataObject> entry : this.newCache.entrySet()) {
+        for (Map.Entry<Integer, DataObject> entry : this.newCache.entrySet()) {
             this.insertDataObject(entry.getValue());
         }
     }
@@ -251,7 +256,7 @@ public abstract class DataMapper {
         this.removeFromNewCache(dataObject);
     }
 
-    protected void insertDataObject(DataObject value) {
+    protected boolean insertDataObject(DataObject value) {
         Map<String, Object> attributes = value.getData();
         Queue values = new ArrayBlockingQueue<Object>(attributes.size() - 1);
 
@@ -277,11 +282,13 @@ public abstract class DataMapper {
                 this.removeFromNewCache(value);
                 this.addToPersistantCache(value);
                 value.resetChangedFields();
+                return true;
             }
         } catch (SQLException e) {
             System.err.println("An error occurred while inserting a dataobject");
             e.printStackTrace();
         }
+        return false;
     }
 
     public static String implodeStringArray(Collection<String> strings) {

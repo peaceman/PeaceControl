@@ -55,7 +55,7 @@ public class loginCommand extends CommandBase {
 
     private boolean checkPassword(String username, String password) throws Exception {
         User tmpUser = this.plugin.userManager.getUser(username);
-        String hashedPassword = this.plugin.userManager.genPasshash(password);
+        String hashedPassword = this.plugin.userManager.genPasshash(tmpUser, password);
         if (!tmpUser.getPasshash().equals(hashedPassword)) {
             return false;
         }

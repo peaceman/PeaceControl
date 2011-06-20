@@ -73,7 +73,7 @@ public class registerCommand extends CommandBase {
         boolean result = this.plugin.userManager.createUser(sender, password, email);
         if (result == true) {
             this.plugin.userManager.loginUser(sender);
-            sender.sendMessage("Successfully registered");
+            sender.sendMessage("Successfully registered and logged in");
         }
         return true;
     }

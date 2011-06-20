@@ -22,11 +22,22 @@ public class PeaceControl extends JavaPlugin {
 
     public final static double version = 0.1;
     public final MyLogger log = new MyLogger();
-    public final UserManager userManager = new UserManager();
+    public UserManager userManager;
 
     @Override
-    public void onEnable() {
-        this.log.info("PeaceControl v" + PeaceControl.version + " has been enabled.");
+    public void onEnable() {        
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String url = "jdbc:mysql://localhost:3306/peacecontrol?zeroDateTimeBehavior=convertToNull";
+            Connection con = DriverManager.getConnection(url, "root", "loladin");
+            this.userManager = new UserManager(new UserMapper(con));
+            
+            this.log.info("PeaceControl v" + PeaceControl.version + " has been enabled.");
+        } catch (SQLException ex) {
+            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -57,25 +68,6 @@ public class PeaceControl extends JavaPlugin {
 
             UserMapper userMapper = new UserMapper(con);
 
-//            User newUser = new User();
-//            newUser.setUsername("test");
-//            newUser.setPasshash("test123");
-//            
-//            userMapper.insertDataObject(newUser);
-//            
-//            System.out.println("Id of the new user " + newUser.getId());
-
-            for (int i = 0; i < 10000; i++) {
-
-                User newUser = (User) userMapper.getNewDataObject();
-                newUser.setUsername("newUser");
-                newUser.setPasshash("omgwaseinhash");
-                userMapper.persistCaches();
-                newUser.setUsername("changedUser");
-                userMapper.persistCaches();
-                newUser.setRegisteredAt(new Date(123, 2, 3, 23, 5));
-                userMapper.persistCaches();
-            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
