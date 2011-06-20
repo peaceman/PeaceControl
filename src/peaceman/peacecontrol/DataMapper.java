@@ -149,7 +149,7 @@ public abstract class DataMapper {
 
         try {
             PreparedStatement stmt = this.db.prepareStatement(sb.toString());
-            this.statements.put(sb.toString(), stmt);
+            this.statements.put(string, stmt);
             System.out.println("Created a prepared statement with the following sql " + sb.toString());
             return stmt;
         } catch (SQLException e) {
@@ -250,10 +250,11 @@ public abstract class DataMapper {
 
     protected void insertDataObject(DataObject value) {
         Map<String, Object> attributes = value.getData();
-        Queue values = new ArrayBlockingQueue<Object>(attributes.size());
+        Queue values = new ArrayBlockingQueue<Object>(attributes.size() - 1);
 
         for (String key : attributes.keySet()) {
-            values.add(attributes.get(key));
+            if (!key.equals("id"))
+                values.add(attributes.get(key));
         }
 
         try {

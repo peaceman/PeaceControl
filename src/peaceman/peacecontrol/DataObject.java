@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -59,14 +60,16 @@ public abstract class DataObject {
 
     public Map<String, Object> getData() {
         Map<String, Object> dataFields = new HashMap<String, Object>();
-        Field[] fieldArray = this.getClass().getDeclaredFields();
+        List<Field> fields = new LinkedList<Field>();
+        DataObject.getDataFields(fields, this.getClass());
 
-        for (Field field : fieldArray) {
+        for (Field field : fields) {
             if (field.getName().startsWith("_")) {
                 try {
                     StringBuilder sb = new StringBuilder(field.getName().substring(1));
-                    sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-                    Method accessMethod = this.getClass().getMethod("get" + sb.toString());
+                    StringBuilder sbForMethod = new StringBuilder(sb.toString());
+                    sbForMethod.setCharAt(0, Character.toUpperCase(sbForMethod.charAt(0)));
+                    Method accessMethod = this.getClass().getMethod("get" + sbForMethod.toString());
                     Object result = accessMethod.invoke(this, null);
 
                     dataFields.put(sb.toString(), result);

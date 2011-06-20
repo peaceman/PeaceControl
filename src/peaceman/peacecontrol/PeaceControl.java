@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.command.Command;
@@ -51,7 +52,7 @@ public class PeaceControl extends JavaPlugin {
     public static void main(String[] args) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/peacecontrol";
+            String url = "jdbc:mysql://localhost:3306/peacecontrol?zeroDateTimeBehavior=convertToNull";
             Connection con = DriverManager.getConnection(url, "root", "loladin");
 
             UserMapper userMapper = new UserMapper(con);
@@ -64,16 +65,19 @@ public class PeaceControl extends JavaPlugin {
 //            
 //            System.out.println("Id of the new user " + newUser.getId());
 
-            User user = (User) userMapper.getById(3);
-            user.setUsername("lddol");
+            for (int i = 0; i < 100; i++) {
+                User user = (User) userMapper.getById(3);
+                user.setUsername("lddol");
 
-            User newUser = (User) userMapper.getNewDataObject();
-            newUser.setUsername("newUser");
-            newUser.setPasshash("omgwaseinhash");
-            userMapper.persistCaches();
-            newUser.setUsername("changedUser");
-            userMapper.persistCaches();
-
+                User newUser = (User) userMapper.getNewDataObject();
+                newUser.setUsername("newUser");
+                newUser.setPasshash("omgwaseinhash");
+                userMapper.persistCaches();
+                newUser.setUsername("changedUser");
+                userMapper.persistCaches();
+                newUser.setRegisteredAt(new Date(123, 2, 3, 23, 5));
+                userMapper.persistCaches();
+            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
