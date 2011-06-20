@@ -29,7 +29,7 @@ public class UserManager {
     public boolean createUser(String username, String password, String email) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    
+
     public boolean createUser(CommandSender sender, String password, String email) {
         throw new UnsupportedOperationException("Not yet implemented");
     }

@@ -11,13 +11,12 @@ import peaceman.peacecontrol.command.CommandBase;
  */
 public class deleteCommand extends CommandBase {
 
-	@Override
-	public boolean runCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+    @Override
+    public boolean runCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-	public deleteCommand(PeaceControl plugin) {
-		super(plugin);
-	}
-	
+    public deleteCommand(PeaceControl plugin) {
+        super(plugin);
+    }
 }

@@ -55,7 +55,7 @@ public class PeaceControl extends JavaPlugin {
             Connection con = DriverManager.getConnection(url, "root", "loladin");
 
             UserMapper userMapper = new UserMapper(con);
-            
+
 //            User newUser = new User();
 //            newUser.setUsername("test");
 //            newUser.setPasshash("test123");
@@ -63,16 +63,16 @@ public class PeaceControl extends JavaPlugin {
 //            userMapper.insertDataObject(newUser);
 //            
 //            System.out.println("Id of the new user " + newUser.getId());
-            
-            User user = (User)userMapper.getById(3);
+
+            User user = (User) userMapper.getById(3);
             user.setUsername("lddol");
-            
-            User newUser = (User)userMapper.getNewDataObject();
+
+            User newUser = (User) userMapper.getNewDataObject();
             newUser.setUsername("newUser");
             newUser.setPasshash("omgwaseinhash");
-			userMapper.persistCaches();
-			newUser.setUsername("changedUser");
-			userMapper.persistCaches();
+            userMapper.persistCaches();
+            newUser.setUsername("changedUser");
+            userMapper.persistCaches();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,21 +80,21 @@ public class PeaceControl extends JavaPlugin {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-	
-	public static String genMd5(String toHash) {
-		try {
-			final MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(toHash.getBytes("UTF8"));
-			final byte[] resultByte = md.digest();
-			StringBuilder hexString = new StringBuilder();
-			for (int i = 0; i < resultByte.length; i++) {
-				hexString.append(Integer.toHexString(0xFF & resultByte[i]));
-			}
-			return hexString.toString();
-		} catch (Exception e) {
-			System.err.println("An error occurred while md5-hashing a string");
-			e.printStackTrace();
-			return null;
-		}
-	}
+
+    public static String genMd5(String toHash) {
+        try {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(toHash.getBytes("UTF8"));
+            final byte[] resultByte = md.digest();
+            StringBuilder hexString = new StringBuilder();
+            for (int i = 0; i < resultByte.length; i++) {
+                hexString.append(Integer.toHexString(0xFF & resultByte[i]));
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            System.err.println("An error occurred while md5-hashing a string");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -16,48 +16,51 @@ import java.util.logging.Logger;
  * @author Naegele.Nico
  */
 public abstract class DataObject {
-	protected List<String> changedFields = new ArrayList<String>();
+
+    protected List<String> changedFields = new ArrayList<String>();
     protected long _id;
-	
-	protected static class FieldComparator implements Comparator<Field> {
-		@Override
-		public int compare(Field f1, Field f2) {
-			return f1.getName().compareTo(f2.getName());
-		}
-	}
-	
-	public boolean isChanged() {
-		if (this.changedFields.isEmpty())
-			return false;
-		return true;
-	}
-	
-	public Map<String, Object[]> getChangedFields() {
-		Map<String, Object[]> updatedFieldValues = new HashMap<String, Object[]>();		
-		
-		Class <? extends DataObject> runtimeClass = this.getClass();
-		for (String fieldName : this.changedFields) {
-			try {
-				Field tmpField = runtimeClass.getDeclaredField("_" + fieldName);
+
+    protected static class FieldComparator implements Comparator<Field> {
+
+        @Override
+        public int compare(Field f1, Field f2) {
+            return f1.getName().compareTo(f2.getName());
+        }
+    }
+
+    public boolean isChanged() {
+        if (this.changedFields.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public Map<String, Object[]> getChangedFields() {
+        Map<String, Object[]> updatedFieldValues = new HashMap<String, Object[]>();
+
+        Class<? extends DataObject> runtimeClass = this.getClass();
+        for (String fieldName : this.changedFields) {
+            try {
+                Field tmpField = runtimeClass.getDeclaredField("_" + fieldName);
                 tmpField.setAccessible(true);
-				Object fieldValue = tmpField.get(this);
-				
-				Object[] fieldData = new Object[2];
-				fieldData[0] = tmpField.getType();
-				fieldData[1] = fieldValue;
-				updatedFieldValues.put(fieldName, fieldData);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		
-		return updatedFieldValues;
-	}
-    
+                Object fieldValue = tmpField.get(this);
+
+                Object[] fieldData = new Object[2];
+                fieldData[0] = tmpField.getType();
+                fieldData[1] = fieldValue;
+                updatedFieldValues.put(fieldName, fieldData);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return updatedFieldValues;
+    }
+
     public Map<String, Object> getData() {
         Map<String, Object> dataFields = new HashMap<String, Object>();
         Field[] fieldArray = this.getClass().getDeclaredFields();
-        
+
         for (Field field : fieldArray) {
             if (field.getName().startsWith("_")) {
                 try {
@@ -65,7 +68,7 @@ public abstract class DataObject {
                     sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                     Method accessMethod = this.getClass().getMethod("get" + sb.toString());
                     Object result = accessMethod.invoke(this, null);
-                    
+
                     dataFields.put(sb.toString(), result);
                 } catch (Exception e) {
                     System.err.println("An error occured while exporting data from a dataobject");
@@ -75,54 +78,55 @@ public abstract class DataObject {
         }
         return dataFields;
     }
-	
-	public void resetChangedFields() {
-		this.changedFields.clear();
-	}
-	
-	protected void markAsChanged(String fieldName) {
-		if (!this.changedFields.contains(fieldName)) {
-			this.changedFields.add(fieldName);
-		}
-	}
-	
-	public Class getFieldType(String fieldName) {
-		Class <? extends DataObject> runtimeClass = this.getClass();
-		try {
-			return runtimeClass.getField("_" + fieldName).getType();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
-    
+
+    public void resetChangedFields() {
+        this.changedFields.clear();
+    }
+
+    protected void markAsChanged(String fieldName) {
+        if (!this.changedFields.contains(fieldName)) {
+            this.changedFields.add(fieldName);
+        }
+    }
+
+    public Class getFieldType(String fieldName) {
+        Class<? extends DataObject> runtimeClass = this.getClass();
+        try {
+            return runtimeClass.getField("_" + fieldName).getType();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public static List<Field> getDataFields(List<Field> fields, Class<?> type) {
-        for (Field field: type.getDeclaredFields()) {
-            if (field.getName().startsWith("_"))
+        for (Field field : type.getDeclaredFields()) {
+            if (field.getName().startsWith("_")) {
                 fields.add(field);
+            }
         }
 
         if (type.getSuperclass() != null) {
             fields = getDataFields(fields, type.getSuperclass());
         }
-		
-		Collections.sort(fields, new FieldComparator());				
+
+        Collections.sort(fields, new FieldComparator());
         return fields;
     }
 
-	public void publicate(Map<String, Object> attributes) {
-		Class runtimeClass = this.getClass();
-		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-			try {
+    public void publicate(Map<String, Object> attributes) {
+        Class runtimeClass = this.getClass();
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            try {
                 Field tmpField = DataObject.getField("_" + entry.getKey(), runtimeClass);
                 tmpField.setAccessible(true);
-				tmpField.set(this, entry.getValue());
-			} catch (Exception ex) {
-				Logger.getLogger(DataObject.class.getName()).log(Level.SEVERE, null, ex);
-			}
-		}
-	}
-    
+                tmpField.set(this, entry.getValue());
+            } catch (Exception ex) {
+                Logger.getLogger(DataObject.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     public static Field getField(String name, Class<?> type) {
         try {
             return type.getDeclaredField(name);
@@ -136,10 +140,10 @@ public abstract class DataObject {
         return null;
     }
 
-	public long getId() {
-		return this._id;
-	}
-    
+    public long getId() {
+        return this._id;
+    }
+
     public void setId(long id) {
         this._id = id;
     }

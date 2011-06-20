@@ -13,7 +13,7 @@ import peaceman.peacecontrol.user.User;
  */
 public class UserMapper extends DataMapper {
 
-	public UserMapper(Connection db) {
-		super(db, "user", User.class);
-	}
+    public UserMapper(Connection db) {
+        super(db, "user", User.class);
+    }
 }

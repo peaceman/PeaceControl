@@ -14,13 +14,13 @@ import peaceman.peacecontrol.command.CommandBase;
  * @author Naegele.Nico
  */
 public class changePasswordCommand extends CommandBase {
-	public changePasswordCommand(PeaceControl plugin) {
-		super(plugin);
-	}
-	
-	@Override
-	public boolean runCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-	
+
+    public changePasswordCommand(PeaceControl plugin) {
+        super(plugin);
+    }
+
+    @Override
+    public boolean runCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
