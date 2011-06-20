@@ -8,8 +8,8 @@ import peaceman.peacecontrol.DataObject;
  * @author peaceman
  */
 public class User extends DataObject {
-    private String _username;
-    private String _passhash;
+    private String _username = new String();
+    private String _passhash = new String();
     
     public String getUsername() {
         return this._username;
@@ -20,12 +20,16 @@ public class User extends DataObject {
     }
     
     public void setUsername(String username) {
-        this.markAsChanged("username");
-        this._username = username;
+		if (!this._username.equals(username)) {
+			this.markAsChanged("username");
+			this._username = username;
+		}
     }
     
     public void setPasshash(String passhash) {
-        this.markAsChanged("passhash");
-        this._passhash = passhash;
+		if (!this._passhash.equals(passhash)) {
+			this.markAsChanged("passhash");
+			this._passhash = passhash;
+		}
     }
 }

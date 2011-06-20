@@ -1,5 +1,7 @@
 package peaceman.peacecontrol;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -49,7 +51,7 @@ public class PeaceControl extends JavaPlugin {
     public static void main(String[] args) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/pc";
+            String url = "jdbc:mysql://localhost:3306/peacecontrol";
             Connection con = DriverManager.getConnection(url, "root", "loladin");
 
             UserMapper userMapper = new UserMapper(con);
@@ -63,13 +65,14 @@ public class PeaceControl extends JavaPlugin {
 //            System.out.println("Id of the new user " + newUser.getId());
             
             User user = (User)userMapper.getById(3);
-            user.setUsername("lol");
+            user.setUsername("lddol");
             
-            User newUser = new User();
+            User newUser = (User)userMapper.getNewDataObject();
             newUser.setUsername("newUser");
             newUser.setPasshash("omgwaseinhash");
-            
-            userMapper.insertDataObject(newUser);
+			userMapper.persistCaches();
+			newUser.setUsername("changedUser");
+			userMapper.persistCaches();
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,4 +80,21 @@ public class PeaceControl extends JavaPlugin {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+	
+	public static String genMd5(String toHash) {
+		try {
+			final MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(toHash.getBytes("UTF8"));
+			final byte[] resultByte = md.digest();
+			StringBuilder hexString = new StringBuilder();
+			for (int i = 0; i < resultByte.length; i++) {
+				hexString.append(Integer.toHexString(0xFF & resultByte[i]));
+			}
+			return hexString.toString();
+		} catch (Exception e) {
+			System.err.println("An error occurred while md5-hashing a string");
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

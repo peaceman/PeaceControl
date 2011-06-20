@@ -74,7 +74,7 @@ public abstract class DataMapper {
 	}
 	
 	protected void addToNewCache(DataObject dataObject) {
-		if (dataObject.getId() != 0) {
+		if (dataObject.getId() == 0) {
 			long key = dataObject.hashCode();
 			if (!this.newCache.containsKey(key))
 				this.newCache.put(key, dataObject);
@@ -119,10 +119,42 @@ public abstract class DataMapper {
                     .append(" FROM ")
                     .append(this.tableName)
                     .append(" WHERE id = ?");
-        }
+        } else if (string.equals("insert")) {
+			List<Field> dataFields = new LinkedList<Field>();
+			DataObject.getDataFields(dataFields, this.dataObjectType);
+			
+			List<String> dataFieldNames = new LinkedList<String>();
+			ListIterator<Field> iter = dataFields.listIterator();
+			
+			StringBuilder sb2 = new StringBuilder();
+			while (iter.hasNext()) {
+				Field field = iter.next();
+				if (!field.getName().substring(1).equals("id")) {
+					dataFieldNames.add(field.getName().substring(1));
+					sb2.append("?");
+					if (iter.hasNext() && !iter.next().getName().substring(1).equals("id")) {
+						sb2.append(", ");
+						iter.previous();
+					}
+				}
+			}
+			
+			sb.append("INSERT INTO ")
+					.append(this.tableName)
+					.append(" (")
+					.append(this.implodeStringArray(dataFieldNames))
+					.append(") VALUES (")
+					.append(sb2.toString())
+					.append(")");
+			
+		} else {
+			sb.append(string);
+		}
         
         try {
             PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+			this.statements.put(sb.toString(), stmt);
+			System.out.println("Created a prepared statement with the following sql " + sb.toString());
             return stmt;
         } catch (SQLException e) {
             System.err.println("An error occurred while preparing a statement");
@@ -143,7 +175,7 @@ public abstract class DataMapper {
 		}
 	}
 
-	private void updateDataObject(DataObject value) {
+	protected void updateDataObject(DataObject value) {
 		Map<String, Object[]> changedValues = value.getChangedFields();
 		StringBuilder sb = new StringBuilder();
 		sb.append("UPDATE ");
@@ -169,7 +201,7 @@ public abstract class DataMapper {
 		sb.append(" WHERE id = ?");
 		newValues.add(value.getId());
 		try {
-            PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+			PreparedStatement stmt = this.getStatement(sb.toString());
             int counter = 1;
 
             Object tmpObject = null;		
@@ -206,31 +238,32 @@ public abstract class DataMapper {
 		}
 		return 's';
 	}
+	
+	public DataObject getNewDataObject() {
+		DataObject toReturn = null;
+		try {
+			toReturn = this.dataObjectType.getConstructor().newInstance();
+			this.addToNewCache(toReturn);
+		} catch (Exception e) {
+			System.err.println("An error occurred while creating a new dataobject in datamapper class " + this.getClass().getName());
+		}
+		return toReturn;
+	}
+	
+	public void invalidateDataObject(DataObject dataObject) {
+		this.removeFromNewCache(dataObject);
+	}
 
-	public void insertDataObject(DataObject value) {
+	protected void insertDataObject(DataObject value) {
         Map<String, Object> attributes = value.getData();
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ")
-                .append(this.tableName)
-                .append(" (")
-                .append(this.implodeStringArray(attributes.keySet()))
-                .append(") VALUES (");
+        Queue values = new ArrayBlockingQueue<Object>(attributes.size());
         
-        Queue values = new ArrayBlockingQueue<Object>(attributes.size() );
-        
-        Iterator<Object> iter = attributes.values().iterator();
-        while (iter.hasNext()) {
-            Object tmpObject = iter.next();
-            sb.append('?');
-            if (iter.hasNext()) {
-                sb.append(", ");
-            }
-            values.add(tmpObject);
-        }
-        sb.append(")");
+		for (String key : attributes.keySet()) {
+			values.add(attributes.get(key));
+		}
         
         try {
-            PreparedStatement stmt = this.db.prepareStatement(sb.toString());        
+			PreparedStatement stmt = this.getStatement("insert");       
             int counter = 1;
             while (!values.isEmpty()) {
                 Object tmpObject = values.poll();
@@ -243,9 +276,12 @@ public abstract class DataMapper {
                 ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID() AS id");
                 rs.next();
                 value.setId(rs.getLong("id"));
+				this.removeFromNewCache(value);
+				this.addToPersistantCache(value);
+				value.resetChangedFields();
             }
         } catch (SQLException e) {
-            System.err.println("An error occured while inserting a dataobject");
+            System.err.println("An error occurred while inserting a dataobject");
             e.printStackTrace();
         }
 	}

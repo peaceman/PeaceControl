@@ -3,6 +3,8 @@ package peaceman.peacecontrol;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,13 @@ import java.util.logging.Logger;
 public abstract class DataObject {
 	protected List<String> changedFields = new ArrayList<String>();
     protected long _id;
+	
+	protected static class FieldComparator implements Comparator<Field> {
+		@Override
+		public int compare(Field f1, Field f2) {
+			return f1.getName().compareTo(f2.getName());
+		}
+	}
 	
 	public boolean isChanged() {
 		if (this.changedFields.isEmpty())
@@ -96,7 +105,8 @@ public abstract class DataObject {
         if (type.getSuperclass() != null) {
             fields = getDataFields(fields, type.getSuperclass());
         }
-
+		
+		Collections.sort(fields, new FieldComparator());				
         return fields;
     }
 
