@@ -65,9 +65,7 @@ public class PeaceControl extends JavaPlugin {
 //            
 //            System.out.println("Id of the new user " + newUser.getId());
 
-            for (int i = 0; i < 100; i++) {
-                User user = (User) userMapper.getById(3);
-                user.setUsername("lddol");
+            for (int i = 0; i < 10000; i++) {
 
                 User newUser = (User) userMapper.getNewDataObject();
                 newUser.setUsername("newUser");

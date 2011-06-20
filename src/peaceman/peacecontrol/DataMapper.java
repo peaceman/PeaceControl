@@ -35,6 +35,9 @@ public abstract class DataMapper {
     }
 
     public DataObject getById(long id) {
+        if (this.persistantCache.containsKey(id)) {
+            return this.persistantCache.get(id);
+        }
         try {
             PreparedStatement stmt = this.getStatement("byId");
             stmt.setLong(1, id);
