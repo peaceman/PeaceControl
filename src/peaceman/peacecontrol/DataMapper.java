@@ -65,6 +65,34 @@ public abstract class DataMapper {
 		}
 		return null;
 	}
+	
+	protected void addToPersistantCache(DataObject dataObject) {
+		if (dataObject.getId() != 0) {
+			if (!this.persistantCache.containsKey(dataObject.getId()))
+				this.persistantCache.put(dataObject.getId(), dataObject);
+		}
+	}
+	
+	protected void addToNewCache(DataObject dataObject) {
+		if (dataObject.getId() != 0) {
+			long key = dataObject.hashCode();
+			if (!this.newCache.containsKey(key))
+				this.newCache.put(key, dataObject);
+		}
+	}
+	
+	protected void removeFromPersistantCache(DataObject dataObject) {
+		if (dataObject.getId() != 0) {
+			if (this.persistantCache.containsKey(dataObject.getId()))
+				this.persistantCache.remove(dataObject.getId());
+		}
+	}
+	
+	protected void removeFromNewCache(DataObject dataObject) {
+		long key = dataObject.hashCode();
+		if (this.newCache.containsKey(key))
+			this.newCache.remove(key);
+	}	
 
 	private PreparedStatement getStatement(String string) {
         if (this.statements.containsKey(string)) {
