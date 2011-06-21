@@ -78,6 +78,7 @@ public class UserMapper extends DataMapper {
             }
         } catch (SQLException e) {
             System.out.printf("Couldn't get a row with email %s from table %s\n", email, this.tableName);
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,6 +103,23 @@ public class UserMapper extends DataMapper {
                     .append(" FROM ")
                     .append(this.tableName)
                     .append(" WHERE username = ?");
+            found = true;
+        }
+        
+        if (name.equals("byEmail")) {
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            
+            List<String> dataFieldNames = new LinkedList<String>();
+            for (Field dataField : dataFields) {
+                dataFieldNames.add(dataField.getName().substring(1));
+            }
+            
+            sb.append("SELECT ")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(" FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE email = ?");
             found = true;
         }
         

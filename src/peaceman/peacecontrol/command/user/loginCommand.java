@@ -25,7 +25,7 @@ public class loginCommand extends CommandBase {
         }
         Player player = (Player) sender;
 
-        if (!this.isRegistered(player.getDisplayName())) {
+        if (!this.isRegistered(player.getName())) {
             sender.sendMessage("You have to register first");
             return true;
         }
@@ -36,7 +36,7 @@ public class loginCommand extends CommandBase {
 
         String password = args[0];
         try {
-            if (!this.checkPassword(player.getDisplayName(), password)) {
+            if (!this.checkPassword(player.getName(), password)) {
                 sender.sendMessage("Wrong password");
                 return true;
             }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.omg.CORBA.NamedValue;
 
 /**
  *
@@ -58,10 +59,12 @@ public abstract class DataObject {
         return updatedFieldValues;
     }
 
-    public Map<String, Object> getData() {
-        Map<String, Object> dataFields = new HashMap<String, Object>();
+    public List<ObjectProperty<Object>> getData() {
+        //Map<String, Object> dataFields = new HashMap<String, Object>();
         List<Field> fields = new LinkedList<Field>();
         DataObject.getDataFields(fields, this.getClass());
+        
+        List<ObjectProperty<Object>> dataFields = new LinkedList<ObjectProperty<Object>>();
 
         for (Field field : fields) {
             if (field.getName().startsWith("_")) {
@@ -71,8 +74,7 @@ public abstract class DataObject {
                     sbForMethod.setCharAt(0, Character.toUpperCase(sbForMethod.charAt(0)));
                     Method accessMethod = this.getClass().getMethod("get" + sbForMethod.toString());
                     Object result = accessMethod.invoke(this, null);
-
-                    dataFields.put(sb.toString(), result);
+                    dataFields.add(new ObjectProperty<Object>(sb.toString(), result));
                 } catch (Exception e) {
                     System.err.println("An error occured while exporting data from a dataobject");
                     e.printStackTrace();

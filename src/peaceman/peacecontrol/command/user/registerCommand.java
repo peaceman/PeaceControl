@@ -44,7 +44,7 @@ public class registerCommand extends CommandBase {
         }
 
         if (this.isUserRegistered(username, email)) {
-            sender.sendMessage("A user with this name is already registered");
+            sender.sendMessage("A user with this name/email is already registered");
             return true;
         }
 
@@ -54,7 +54,7 @@ public class registerCommand extends CommandBase {
         return true;
     }
 
-    private boolean handleCommandFromPlayer(Player sender, Command command, String commandLabel, String[] args) throws Exception {
+    private boolean handleCommandFromPlayer(Player player, Command command, String commandLabel, String[] args) throws Exception {
         if (args.length < 1) {
             // at least a password is needed
             return false;
@@ -65,15 +65,15 @@ public class registerCommand extends CommandBase {
             email = args[1];
         }
 
-        if (this.isUserRegistered(sender, email)) {
-            sender.sendMessage("You are already registered");
+        if (this.isUserRegistered(player, email)) {
+            player.sendMessage("You are already registered");
             return true;
         }
 
-        boolean result = this.plugin.userManager.createUser(sender, password, email);
+        boolean result = this.plugin.userManager.createUser(player, password, email);
         if (result == true) {
-            this.plugin.userManager.loginUser(sender);
-            sender.sendMessage("Successfully registered and logged in");
+            this.plugin.userManager.loginUser(player);
+            player.sendMessage("Successfully registered and logged in");
         }
         return true;
     }

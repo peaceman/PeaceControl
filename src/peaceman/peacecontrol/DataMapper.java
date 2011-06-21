@@ -139,13 +139,13 @@ public abstract class DataMapper {
             StringBuilder sb2 = new StringBuilder();
             while (iter.hasNext()) {
                 Field field = iter.next();
-                if (!field.getName().substring(1).equals("id")) {
-                    dataFieldNames.add(field.getName().substring(1));
-                    sb2.append("?");
-                    if (iter.hasNext() && !iter.next().getName().substring(1).equals("id")) {
-                        sb2.append(", ");
-                        iter.previous();
-                    }
+                if (field.getName().equals("_id"))
+                    continue;
+                
+                dataFieldNames.add(field.getName().substring(1));
+                sb2.append("?");
+                if (iter.hasNext()) {
+                    sb2.append(", ");
                 }
             }
 
@@ -257,12 +257,14 @@ public abstract class DataMapper {
     }
 
     protected boolean insertDataObject(DataObject value) {
-        Map<String, Object> attributes = value.getData();
+        List<ObjectProperty<Object>> attributes = value.getData();
         Queue values = new ArrayBlockingQueue<Object>(attributes.size() - 1);
-
-        for (String key : attributes.keySet()) {
-            if (!key.equals("id"))
-                values.add(attributes.get(key));
+        
+        for (ObjectProperty<Object> property : attributes) {
+            if (property.getName().equals("id"))
+                continue;
+            
+            values.add(property.getProperty());
         }
 
         try {

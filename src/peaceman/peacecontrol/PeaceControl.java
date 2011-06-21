@@ -67,6 +67,9 @@ public class PeaceControl extends JavaPlugin {
             Connection con = DriverManager.getConnection(url, "root", "loladin");
 
             UserMapper userMapper = new UserMapper(con);
+            UserManager userManager = new UserManager(userMapper);
+            
+            userManager.createUser("peaceman", "loladin", null);
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);

@@ -43,21 +43,21 @@ public class User extends DataObject {
     }
 
     public void setUsername(String username) {
-        if (!this._username.equals(username)) {
+        if (username != null && !this._username.equals(username)) {
             this.markAsChanged("username");
             this._username = username;
         }
     }
 
     public void setPasshash(String passhash) {
-        if (!this._passhash.equals(passhash)) {
+        if (passhash != null && !this._passhash.equals(passhash)) {
             this.markAsChanged("passhash");
             this._passhash = passhash;
         }
     }
     
     public void setRegisteredAt(Date registeredAt) {
-        if (this._registeredAt != null) {
+        if (registeredAt != null && this._registeredAt != null) {
             if (!this._registeredAt.equals(registeredAt)) {
                 this.markAsChanged("registeredAt");
                 this._registeredAt = registeredAt;
@@ -68,21 +68,21 @@ public class User extends DataObject {
     }
     
     public void setSalt(String salt) {
-        if (!this._salt.equals(salt)) {
+        if (salt != null && !this._salt.equals(salt)) {
             this.markAsChanged("salt");
             this._salt = salt;
         }
     }
     
     public void setEmail(String email) {
-        if (!this._email.equals(email)) {
+        if (email != null && !this._email.equals(email)) {
             this.markAsChanged("email");
             this._email = email;
         }
     }
     
     public void setIp(String ip) {
-        if (!this._ip.equals(ip)) {
+        if (ip != null && !this._ip.equals(ip)) {
             this.markAsChanged("ip");
             this._ip = ip;
         }
