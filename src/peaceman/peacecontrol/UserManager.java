@@ -102,4 +102,22 @@ public class UserManager {
         this.logoutUser(player);
         this.deleteUser(player);
     }
+
+    public boolean changePassword(String name, String newPassword) {
+        User user = this.getUser(name);
+        return this.changePassword(user, newPassword);
+    }
+
+    public boolean changePassword(User user, String newPassword) {
+        if (user == null) {
+            return false;
+        }
+        
+        user.setPasshash(this.genPasshash(user, newPassword));
+        return true;
+    }
+
+    public User getUserByEmail(String value) {
+        return this.userMapper.getByEmail(value);
+    }
 }
