@@ -68,7 +68,7 @@ public abstract class DataMapper {
         }
         return null;
     }
-
+    
     protected void addToPersistantCache(DataObject dataObject) {
         if (dataObject.getId() != 0) {
             if (!this.persistantCache.containsKey(dataObject.getId())) {
@@ -252,8 +252,24 @@ public abstract class DataMapper {
         return toReturn;
     }
 
-    public void invalidateDataObject(DataObject dataObject) {
-        this.removeFromNewCache(dataObject);
+    public void delete(DataObject dataObject) {
+        if (dataObject.getId() == 0) {
+            this.removeFromNewCache(dataObject);
+        } else {
+            this.removeFromPersistantCache(dataObject);
+            
+            this.deleteById(dataObject.getId());
+        }
+    }
+    
+    public void deleteById(long id) {
+        try {
+            PreparedStatement stmt = this.getStatement("delById");
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Couldn't delete a row with id " + id + " from " + this.tableName);
+        }
     }
 
     protected boolean insertDataObject(DataObject value) {

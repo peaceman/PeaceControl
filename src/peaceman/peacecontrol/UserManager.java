@@ -76,4 +76,30 @@ public class UserManager {
         }
         return true;
     }
+    
+    public boolean checkPassword(String username, String password) {
+        User tmpUser = this.getUser(username);
+        String hashedPassword = this.genPasshash(tmpUser, password);
+        if (!tmpUser.getPasshash().equals(hashedPassword)) {
+            return false;
+        }
+        return true;
+    }
+
+    public void deleteUser(Player player) {
+        this.deleteUser(player.getName());
+    }
+    
+    public boolean deleteUser(String username) {
+        return this.userMapper.deleteByUsername(username);
+    }
+    
+    public boolean deleteUserByEmail(String email) {
+        return this.userMapper.deleteByEmail(email);
+    }
+    
+    public void deleteAndLogoutUser(Player player) {
+        this.logoutUser(player);
+        this.deleteUser(player);
+    }
 }

@@ -85,6 +85,40 @@ public class UserMapper extends DataMapper {
         return null;
     }
     
+    public boolean deleteByUsername(String username) {
+        try {
+            PreparedStatement stmt = this.getStatement("delByUsername");
+            stmt.setString(1, username);
+            int deletedRows = stmt.executeUpdate();
+            if (deletedRows != 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.printf("Couln't delete a row with username %s from table %s\n", username, this.tableName);
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean deleteByEmail(String email) {
+        try {
+            PreparedStatement stmt = this.getStatement("delByEmail");
+            stmt.setString(1, email);
+            int deletedRows = stmt.executeUpdate();
+            if (deletedRows != 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.printf("Couldn't delete a row with email %s from table %s\n", email, this.tableName);
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     protected PreparedStatement prepareStatement(String name) {
         boolean found = false;
         StringBuilder sb = new StringBuilder();
@@ -118,6 +152,20 @@ public class UserMapper extends DataMapper {
             sb.append("SELECT ")
                     .append(this.implodeStringArray(dataFieldNames))
                     .append(" FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE email = ?");
+            found = true;
+        }
+        
+        if (name.equals("delByUsername")) {
+            sb.append("DELETE FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE username = ?");
+            found = true;
+        }
+        
+        if (name.equals("delByEmail")) {
+            sb.append("DELETE FROM ")
                     .append(this.tableName)
                     .append(" WHERE email = ?");
             found = true;

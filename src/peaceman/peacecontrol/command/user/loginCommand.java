@@ -36,7 +36,7 @@ public class loginCommand extends CommandBase {
 
         String password = args[0];
         try {
-            if (!this.checkPassword(player.getName(), password)) {
+            if (!this.plugin.userManager.checkPassword(player.getName(), password)) {
                 sender.sendMessage("Wrong password");
                 return true;
             }
@@ -51,14 +51,5 @@ public class loginCommand extends CommandBase {
 
     private boolean isRegistered(String username) {
         return this.plugin.userManager.usernameExists(username);
-    }
-
-    private boolean checkPassword(String username, String password) throws Exception {
-        User tmpUser = this.plugin.userManager.getUser(username);
-        String hashedPassword = this.plugin.userManager.genPasshash(tmpUser, password);
-        if (!tmpUser.getPasshash().equals(hashedPassword)) {
-            return false;
-        }
-        return true;
     }
 }

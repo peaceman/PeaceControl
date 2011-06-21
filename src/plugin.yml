@@ -24,6 +24,6 @@ commands:
         usage: /<command> <oldpassword> <newpassword>
     user.delete:
         description: Deletes the user account
-        aliases: [deleteaccount, unregister]
+        aliases: [deleteaccount, deregister]
         usage: /<command> <password>
         
