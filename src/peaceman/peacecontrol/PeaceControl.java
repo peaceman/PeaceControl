@@ -63,7 +63,7 @@ public class PeaceControl extends JavaPlugin {
     public static void main(String[] args) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/peacecontrol?zeroDateTimeBehavior=convertToNull";
+            String url = "jdbc:mysql://localhost:3306/pc?zeroDateTimeBehavior=convertToNull";
             Connection con = DriverManager.getConnection(url, "root", "loladin");
 
             UserMapper userMapper = new UserMapper(con);
