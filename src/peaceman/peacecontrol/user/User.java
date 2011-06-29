@@ -1,6 +1,5 @@
 package peaceman.peacecontrol.user;
 
-import java.util.Date;
 import java.util.Random;
 import peaceman.peacecontrol.DataObject;
 import peaceman.peacecontrol.PeaceControl;
