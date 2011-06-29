@@ -13,10 +13,8 @@ public class User extends DataObject {
 
     private String _username = new String();
     private String _passhash = new String();
-    private Date _registeredAt = new Date();
     private String _salt = new String();
     private String _email = new String();
-    private String _ip = new String();
 
     public String getUsername() {
         return this._username;
@@ -26,20 +24,12 @@ public class User extends DataObject {
         return this._passhash;
     }
     
-    public Date getRegisteredAt() {
-        return this._registeredAt;
-    }
-    
     public String getSalt() {
         return this._salt;
     }
     
     public String getEmail() {
         return this._email;
-    }
-    
-    public String getIp() {
-        return this._ip;
     }
 
     public void setUsername(String username) {
@@ -56,13 +46,6 @@ public class User extends DataObject {
         }
     }
     
-    public void setRegisteredAt(Date registeredAt) {
-        if (registeredAt != null && !this._registeredAt.equals(registeredAt)) {
-            this._registeredAt = registeredAt;
-            this.markAsChanged("registeredAt");
-        }
-    }
-    
     public void setSalt(String salt) {
         if (salt != null && !this._salt.equals(salt)) {
             this.markAsChanged("salt");
@@ -74,13 +57,6 @@ public class User extends DataObject {
         if (email != null && !this._email.equals(email)) {
             this.markAsChanged("email");
             this._email = email;
-        }
-    }
-    
-    public void setIp(String ip) {
-        if (ip != null && !this._ip.equals(ip)) {
-            this.markAsChanged("ip");
-            this._ip = ip;
         }
     }
     
