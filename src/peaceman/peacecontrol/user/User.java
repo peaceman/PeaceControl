@@ -57,13 +57,9 @@ public class User extends DataObject {
     }
     
     public void setRegisteredAt(Date registeredAt) {
-        if (registeredAt != null && this._registeredAt != null) {
-            if (!this._registeredAt.equals(registeredAt)) {
-                this.markAsChanged("registeredAt");
-                this._registeredAt = registeredAt;
-            }
-        } else {
+        if (registeredAt != null && !this._registeredAt.equals(registeredAt)) {
             this._registeredAt = registeredAt;
+            this.markAsChanged("registeredAt");
         }
     }
     

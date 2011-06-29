@@ -119,6 +119,10 @@ public class UserMapper extends DataMapper {
         }
     }
     
+    public User getById(long id) {
+        return (User)super.getById(id);
+    }
+    
     protected PreparedStatement prepareStatement(String name) {
         boolean found = false;
         StringBuilder sb = new StringBuilder();

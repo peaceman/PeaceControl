@@ -1,6 +1,7 @@
 package peaceman.peacecontrol;
 
 import java.util.Date;
+import peaceman.peacecontrol.user.User;
 
 /**
  *
@@ -13,6 +14,7 @@ public class Session extends DataObject {
     private String _ip = new String();
     private User user;
     private long _userId;
+    private UserMapper userMapper;
     
     public Date getStartedAt() {
         return this._startedAt;
@@ -27,11 +29,27 @@ public class Session extends DataObject {
     }
     
     public long getUserId() {
-        return this._userId;
+        if (this.user != null) {
+            return this.user.getId();
+        } else {
+            return this._userId;
+        }
     }
     
     public User getUser() {
+        if (this.user == null) {
+            this.lazyLoadUser();
+        }
+        
         return this.user;
+    }
+    
+    private void lazyLoadUser() {
+        if (this._userId == 0) {
+            return;
+        }
+        
+        this.user = this.userMapper.getById(this._userId);
     }
     
     public void setStartedAt(Date startedAt) {
@@ -57,7 +75,32 @@ public class Session extends DataObject {
     
     public void setUserId(long id) {
         if (this.user != null) {
+            if (this.user.getId() != id) {
+                this.user = null;
+                this._userId = id;
+                this.markAsChanged("userId");
+            }
+        } else {
+            if (this._userId != id) {
+                this._userId = id;
+                this.markAsChanged("userId");
+            }
+        }
+    }
+    
+    public void setUser(User user) throws IllegalArgumentException {
+        if (user != null) {
+            if (user.getId() == 0) {
+                throw new IllegalArgumentException("Cant set a user as property if he doesnt has a valid id");
+            }
             
+            if (!this.user.equals(user)) {
+                this.user = user;
+                if (this._userId != user.getId()) {
+                    this._userId = user.getId();
+                    this.markAsChanged("userId");
+                }
+            }
         }
     }
 }
