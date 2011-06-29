@@ -20,6 +20,39 @@ public class SessionMapper extends DataMapper {
         super(db, "session", Session.class);
     }
     
+    public List<Session> getSessionsByIp(String ip) {
+        List<Session> toReturn = new LinkedList<Session>();
+        
+        try {
+            PreparedStatement stmt = this.getStatement("byIp");
+            stmt.setString(1, ip);
+            
+            ResultSet result = stmt.executeQuery();
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            while (result.next()) {
+                Map<String, Object> attributes = new HashMap<String, Object>();
+                for (Field field : dataFields) {
+                    String fieldName = field.getName().substring(1);
+                    attributes.put(fieldName, result.getObject(fieldName));
+                    
+                    Session tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
+                    
+                    this.addToPersistantCache(tmpObject);
+                    toReturn.add(tmpObject);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.printf("Couldnt get rows from table %s by ip %s", this.tableName, ip);
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return toReturn;
+    }
+    
     public List<Session> getSessionsByUser(User user) {
         return this.getSessionsByUserId(user.getId());
     }
@@ -28,7 +61,7 @@ public class SessionMapper extends DataMapper {
         List<Session> toReturn = new LinkedList<Session>();
         
         try {
-            PreparedStatement stmt = this.getStatement("getByUserId");
+            PreparedStatement stmt = this.getStatement("byUserId");
             stmt.setLong(1, userId);
             
             ResultSet result = stmt.executeQuery();
@@ -55,5 +88,59 @@ public class SessionMapper extends DataMapper {
         }
         
         return toReturn;
+    }
+    
+    protected PreparedStatement preparedStatement(String name) {
+        boolean found = false;
+        StringBuilder sb = new StringBuilder();
+        
+        if (name.equals("byUserId")) {
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            
+            List<String> dataFieldNames = new LinkedList<String>();
+            for (Field dataField : dataFields) {
+                dataFieldNames.add(dataField.getName().substring(1));
+            }
+            
+            sb.append("SELECT ")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(" FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE userId = ?");
+            found = true;
+        }
+        
+        if (name.equals("byIp")) {
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            
+            List<String> dataFieldNames = new LinkedList<String>();
+            for (Field dataField : dataFields) {
+                dataFieldNames.add(dataField.getName().substring(1));
+            }
+            
+            sb.append("SELECT ")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(" FROM ")
+                    .append(this.tableName)
+                    .append(" WHERE ip = ?");
+            found = true;
+        }
+        
+        if (found == true) {
+            try {
+                PreparedStatement stmt = this.db.prepareStatement(sb.toString());
+                this.statements.put(name, stmt);
+                System.out.println("Created a prepared statement with the following sql " + sb.toString());
+                return stmt;
+            } catch (SQLException e) {
+                System.err.println("An error occurred while preparing a statement");
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return super.prepareStatement(name);
+        }        
     }
 }

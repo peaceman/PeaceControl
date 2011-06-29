@@ -54,7 +54,6 @@ public class UserManager {
         newUser.setPasshash(this.genPasshash(newUser, password));
         newUser.setEmail(email);
         newUser.setUsername(username);
-        newUser.setIp("127.0.0.1");
         return this.userMapper.forceInsert(newUser);
     }
 
@@ -65,7 +64,6 @@ public class UserManager {
         newUser.setPasshash(PeaceControl.genMd5(newUser.getSalt() + password));
         newUser.setEmail(email);
         newUser.setUsername(player.getName());
-        newUser.setIp(ip);
         return this.userMapper.forceInsert(newUser);
     }
 
