@@ -1,6 +1,7 @@
 package peaceman.peacecontrol;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.entity.Player;
 import peaceman.peacecontrol.user.User;
@@ -117,5 +118,13 @@ public class UserManager {
 
     public User getUserByEmail(String value) {
         return this.userMapper.getByEmail(value);
+    }
+
+    public int getUserCount() {
+        return this.userMapper.getCount();
+    }
+
+    public List<User> getUsers() {
+        return this.userMapper.getAll();
     }
 }

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import peaceman.peacecontrol.user.User;
 
 /**
@@ -39,9 +41,12 @@ public class UserMapper extends DataMapper {
 
                 DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
                 tmpObject.publicate(attributes);
+                
+                if (this.persistantCache.containsKey(tmpObject.getId())) {
+                    return (User)this.persistantCache.get(tmpObject.getId());
+                }
 
                 this.addToPersistantCache(tmpObject);
-
                 return (User)tmpObject;
             }
         } catch (SQLException e) {
@@ -71,6 +76,10 @@ public class UserMapper extends DataMapper {
                 
                 DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
                 tmpObject.publicate(attributes);
+                
+                if (this.persistantCache.containsKey(tmpObject.getId())) {
+                    return (User)this.persistantCache.get(tmpObject.getId());
+                }
                 
                 this.addToPersistantCache(tmpObject);
                 
@@ -119,10 +128,12 @@ public class UserMapper extends DataMapper {
         }
     }
     
+    @Override
     public User getById(long id) {
         return (User)super.getById(id);
     }
     
+    @Override
     protected PreparedStatement prepareStatement(String name) {
         boolean found = false;
         StringBuilder sb = new StringBuilder();
@@ -175,6 +186,28 @@ public class UserMapper extends DataMapper {
             found = true;
         }
         
+        if (name.equals("count")) {
+            sb.append("SELECT COUNT(id) FROM ")
+                    .append(this.tableName);
+            found = true;
+        }
+        
+        if (name.equals("all")) {
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+            
+            List<String> dataFieldNames = new LinkedList<String>();
+            for (Field dataField : dataFields) {
+                dataFieldNames.add(dataField.getName().substring(1));
+            }
+            
+            sb.append("SELECT ")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(" FROM ")
+                    .append(this.tableName);
+            found = true;
+        }
+        
         if (found == true) {
             try {
                 PreparedStatement stmt = this.db.prepareStatement(sb.toString());
@@ -189,5 +222,57 @@ public class UserMapper extends DataMapper {
         } else {
             return super.prepareStatement(name);
         }
+    }
+
+    public int getCount() {
+        try {
+            PreparedStatement stmt = this.getStatement("count");
+            ResultSet result = stmt.executeQuery();
+            
+            if (result.next()) {
+                return result.getInt(1);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserMapper.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        return 0;
+    }
+
+    public List<User> getAll() {
+        List<User> toReturn = new LinkedList<User>();
+        
+        try {
+            PreparedStatement stmt = this.getStatement("all");
+            ResultSet result = stmt.executeQuery();
+
+            User tmpObject;
+            List<Field> dataFields = new LinkedList<Field>();
+            DataObject.getDataFields(dataFields, this.dataObjectType);
+
+            while (result.next()) {
+                Map<String, Object> attributes = new HashMap<String, Object>();
+                for (Field field : dataFields) {
+                    String fieldName = field.getName().substring(1);
+                    attributes.put(fieldName, result.getObject(fieldName));
+                }
+
+                if (this.persistantCache.containsKey(attributes.get("id"))) {
+                    tmpObject = (User)this.persistantCache.get(attributes.get("id"));
+                } else {
+                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
+                }
+
+                toReturn.add(tmpObject);
+            }
+        } catch (SQLException e) {
+            System.out.printf("Couldnt get rows from table %s", this.tableName);
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return toReturn;
     }
 }

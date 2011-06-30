@@ -6,6 +6,10 @@ commands:
         description: PeaceControl Help
         aliases: [pc,peacecontrol]
         usage: /<command>
+    user:
+        description: User Management
+        aliases: [u, user]
+        usage: /<command> <action> [<parameters>]
     user.register:
         description: Registers a user
         aliases: [register, reg]
