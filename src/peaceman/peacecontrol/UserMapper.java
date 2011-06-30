@@ -38,16 +38,18 @@ public class UserMapper extends DataMapper {
                     String fieldName = field.getName().substring(1);
                     attributes.put(fieldName, result.getObject(fieldName));
                 }
-
-                DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
-                tmpObject.publicate(attributes);
                 
-                if (this.persistantCache.containsKey(tmpObject.getId())) {
-                    return (User)this.persistantCache.get(tmpObject.getId());
+                User tmpObject;
+                
+                if (this.persistantCache.containsKey(attributes.get("id"))) {
+                    tmpObject = (User)this.persistantCache.get(attributes.get("id"));
+                } else {
+                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
+                    this.addToPersistantCache(tmpObject);
                 }
-
-                this.addToPersistantCache(tmpObject);
-                return (User)tmpObject;
+                
+                return tmpObject;
             }
         } catch (SQLException e) {
             System.out.printf("Couldn't get a row with username %s from table %s\n", username, this.tableName);
@@ -74,14 +76,15 @@ public class UserMapper extends DataMapper {
                     attributes.put(fieldName, result.getObject(fieldName));
                 }
                 
-                DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
-                tmpObject.publicate(attributes);
+                User tmpObject;
                 
-                if (this.persistantCache.containsKey(tmpObject.getId())) {
-                    return (User)this.persistantCache.get(tmpObject.getId());
+                if (this.persistantCache.containsKey(attributes.get("id"))) {
+                    tmpObject = (User)this.persistantCache.get(attributes.get("id"));
+                } else {
+                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
+                    this.addToPersistantCache(tmpObject);
                 }
-                
-                this.addToPersistantCache(tmpObject);
                 
                 return (User)tmpObject;
             }

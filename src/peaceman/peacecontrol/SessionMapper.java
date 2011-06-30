@@ -37,15 +37,17 @@ public class SessionMapper extends DataMapper {
                     attributes.put(fieldName, result.getObject(fieldName));
                 }
                 
-                Session tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
-                tmpObject.publicate(attributes);
-
-                if (this.persistantCache.containsKey(tmpObject.getId())) {
-                    toReturn.add((Session)this.persistantCache.get(tmpObject.getId()));
+                Session tmpObject;
+                
+                if (this.persistantCache.containsKey(attributes.get("id"))) {
+                    tmpObject = (Session)this.persistantCache.get(attributes.get("id"));
                 } else {
+                    tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
-                    toReturn.add(tmpObject);
-                }                
+                }
+                
+                toReturn.add(tmpObject);
             }
         } catch (SQLException e) {
             System.out.printf("Couldnt get rows from table %s by ip %s", this.tableName, ip);
@@ -77,16 +79,18 @@ public class SessionMapper extends DataMapper {
                     String fieldName = field.getName().substring(1);
                     attributes.put(fieldName, result.getObject(fieldName));
                 }
-
-                Session tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
-                tmpObject.publicate(attributes);
-
-                if (this.persistantCache.containsKey(tmpObject.getId())) {
-                    toReturn.add((Session)this.persistantCache.get(tmpObject.getId()));
+                
+                Session tmpObject;
+                
+                if (this.persistantCache.containsKey(attributes.get("id"))) {
+                    tmpObject = (Session)this.persistantCache.get(attributes.get("id"));
                 } else {
+                    tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
-                    toReturn.add(tmpObject);                        
-                }                
+                }
+                
+                toReturn.add(tmpObject);            
             }
         } catch (SQLException e) {
             System.out.printf("Couldnt get rows from table %s with user id %d", this.tableName, userId);
