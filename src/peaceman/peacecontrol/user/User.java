@@ -1,8 +1,12 @@
 package peaceman.peacecontrol.user;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import peaceman.peacecontrol.DataObject;
 import peaceman.peacecontrol.PeaceControl;
+import peaceman.peacecontrol.Session;
+import peaceman.peacecontrol.SessionMapper;
 
 /**
  *
@@ -14,7 +18,10 @@ public class User extends DataObject {
     private String _passhash = new String();
     private String _salt = new String();
     private String _email = new String();
-
+    private LinkedList<Session> sessions;
+    
+    private SessionMapper sessionMapper;
+    
     public String getUsername() {
         return this._username;
     }
@@ -29,6 +36,18 @@ public class User extends DataObject {
     
     public String getEmail() {
         return this._email;
+    }
+    
+    public LinkedList<Session> getSessions() {
+        if (this.sessions == null) {
+            this.lazyLoadSessions();
+        }
+        
+        return this.sessions;
+    }
+    
+    private void lazyLoadSessions() {
+        this.sessions = this.sessionMapper.getSessionsByUser(this);
     }
 
     public void setUsername(String username) {
@@ -63,5 +82,15 @@ public class User extends DataObject {
         Random generator = new Random();
         Integer r = generator.nextInt();
         return PeaceControl.genMd5(r.toString());
+    }
+
+    public Session getRegisterSession() {
+        LinkedList<Session> sessions = this.getSessions();
+        return sessions.getFirst();
+    }
+
+    public Session getLastSession() {
+        LinkedList<Session> sessions = this.getSessions();
+        return sessions.getLast();
     }
 }

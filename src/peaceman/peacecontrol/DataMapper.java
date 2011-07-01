@@ -149,8 +149,13 @@ public abstract class DataMapper {
                 }
             }
 
-            sb.append("INSERT INTO ").append(this.tableName).append(" (").append(this.implodeStringArray(dataFieldNames)).append(") VALUES (").append(sb2.toString()).append(")");
-
+            sb.append("INSERT INTO ")
+                    .append(this.tableName)
+                    .append(" (")
+                    .append(this.implodeStringArray(dataFieldNames))
+                    .append(") VALUES (")
+                    .append(sb2.toString())
+                    .append(")");
         } else {
             sb.append(string);
         }
@@ -220,25 +225,6 @@ public abstract class DataMapper {
             System.err.println("An error occured while preparing a sql query");
             e.printStackTrace();
         }
-    }
-
-    private char determineSqlPlaceholder(Class type) {
-        try {
-            if (type.getName().equals("java.lang.String")) {
-                return 's';
-            }
-
-            if (type.getName().equals("int")) {
-                return 'i';
-            }
-
-            if (type.getName().equals("long")) {
-                return 'i';
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 's';
     }
 
     public DataObject getNewDataObject() {

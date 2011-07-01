@@ -52,10 +52,12 @@ public class listAction extends CommandAction {
             endIndex = users.size() - 1;
         }
         for (User user : users.subList(startIndex, endIndex)) {
-            sb.append(user.getUsername())
-                    .append(" ")
-                    .append(user.getEmail())
-                    .append("\n");
+            sb.append("Name: ")
+                    .append(user.getUsername())
+                    .append(" eMail: ");
+            if (user.getEmail() != null)
+                sb.append(user.getEmail());
+            sb.append("\n");
         }         
         sender.sendMessage(sb.toString());                
         

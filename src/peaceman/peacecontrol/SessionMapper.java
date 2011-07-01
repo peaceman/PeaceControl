@@ -59,12 +59,12 @@ public class SessionMapper extends DataMapper {
         return toReturn;
     }
     
-    public List<Session> getSessionsByUser(User user) {
+    public LinkedList<Session> getSessionsByUser(User user) {
         return this.getSessionsByUserId(user.getId());
     }
     
-    public List<Session> getSessionsByUserId(long userId) {
-        List<Session> toReturn = new LinkedList<Session>();
+    public LinkedList<Session> getSessionsByUserId(long userId) {
+        LinkedList<Session> toReturn = new LinkedList<Session>();
         
         try {
             PreparedStatement stmt = this.getStatement("byUserId");
@@ -139,6 +139,8 @@ public class SessionMapper extends DataMapper {
                     .append(" WHERE ip = ?");
             found = true;
         }
+        
+        sb.append(" ORDER BY startedAt");
         
         if (found == true) {
             try {
