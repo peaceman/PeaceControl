@@ -57,7 +57,9 @@ public class listAction extends CommandAction {
             sb.append("Name: ")
                     .append(user.getUsername())
                     .append(" eMail: ");
-            if (user.getEmail() != null)
+            if (user.getEmail().isEmpty())
+                sb.append("none");                
+            else
                 sb.append(user.getEmail());
             sb.append("\n");
         }         

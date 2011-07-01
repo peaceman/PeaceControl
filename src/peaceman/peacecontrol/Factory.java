@@ -41,11 +41,11 @@ public class Factory {
     public DataObject getDataObject(String type) {
         DataObject toReturn = null;
         
-        if (type.equals("user")) {
+        if (type.equalsIgnoreCase("user")) {
             toReturn = new User((SessionMapper)this.getDataMapper("session"));
         }
         
-        if (type.equals("session")) {
+        if (type.equalsIgnoreCase("session")) {
             toReturn = new Session((UserMapper)this.getDataMapper("user"));
         }
         

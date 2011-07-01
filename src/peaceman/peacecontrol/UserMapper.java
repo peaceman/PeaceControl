@@ -81,7 +81,7 @@ public class UserMapper extends DataMapper {
                 if (this.persistantCache.containsKey(attributes.get("id"))) {
                     tmpObject = (User)this.persistantCache.get(attributes.get("id"));
                 } else {
-                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject = (User)this.factory.getDataObject("user");
                     tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
                 }

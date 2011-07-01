@@ -1,5 +1,6 @@
 package peaceman.peacecontrol;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class UserManager {
         newUser.setPasshash(this.genPasshash(newUser, password));
         newUser.setEmail(email);
         newUser.setUsername(username);
+        newUser.setRegisteredAt(new Date());
         return this.userMapper.forceInsert(newUser);
     }
 
@@ -69,6 +71,7 @@ public class UserManager {
         newUser.setPasshash(PeaceControl.genMd5(newUser.getSalt() + password));
         newUser.setEmail(email);
         newUser.setUsername(player.getName());
+        newUser.setRegisteredAt(new Date());
         return this.userMapper.forceInsert(newUser);
     }
 

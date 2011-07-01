@@ -1,11 +1,13 @@
 package peaceman.peacecontrol.command.user;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import peaceman.peacecontrol.PeaceControl;
+import peaceman.peacecontrol.Session;
 import peaceman.peacecontrol.command.CommandAction;
 import peaceman.peacecontrol.user.User;
 
@@ -45,7 +47,7 @@ public class infoAction extends CommandAction {
         }
         
         this.showUserInformation(sender, user);
-        return false;
+        return true;
     }
     
     private void showHelp(CommandSender sender) {
@@ -54,10 +56,15 @@ public class infoAction extends CommandAction {
     
     private void showUserInformation(CommandSender sender, User user) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Username: ").append(user.getUsername()).append("\n")
-                .append("eMail: ").append(user.getEmail()).append("\n")
-                .append("Registered since: ").append(user.getRegisterSession().getStartedAt()).append("\n")
-                .append("Last IP: ").append(user.getLastSession().getIp()).append("\n");
+        String username = user.getUsername();
+        Date registeredSince = user.getRegisteredAt();
+        String email = user.getEmail().isEmpty() ? "none" : user.getEmail();
+        String ip = user.getLastSession() != null ? user.getLastSession().getIp() : "Hasnt logged in yet!";
+        
+        sb.append("Username: ").append(username).append("\n")
+                .append("eMail: ").append(email).append("\n")
+                .append("Registered since: ").append(registeredSince).append("\n")
+                .append("Last IP: ").append(ip);
         sender.sendMessage(sb.toString());                
     }
     

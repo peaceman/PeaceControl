@@ -55,7 +55,7 @@ public abstract class DataMapper {
                     attributes.put(fieldName, result.getObject(fieldName));
                 }
 
-                DataObject tmpObject = this.dataObjectType.getConstructor().newInstance();
+                DataObject tmpObject = this.factory.getDataObject(this.dataObjectType.getSimpleName());
                 tmpObject.publicate(attributes);
                 
                 this.addToPersistantCache(tmpObject);

@@ -1,5 +1,6 @@
 package peaceman.peacecontrol.user;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Random;
 import peaceman.peacecontrol.DataObject;
@@ -17,6 +18,7 @@ public class User extends DataObject {
     private String _passhash = new String();
     private String _salt = new String();
     private String _email = new String();
+    private Date _registeredAt = new Date();
     private LinkedList<Session> sessions;
     
     private SessionMapper sessionMapper;
@@ -39,6 +41,10 @@ public class User extends DataObject {
     
     public String getEmail() {
         return this._email;
+    }
+    
+    public Date getRegisteredAt() {
+        return this._registeredAt;
     }
     
     public LinkedList<Session> getSessions() {
@@ -78,6 +84,13 @@ public class User extends DataObject {
         if (email != null && !this._email.equals(email)) {
             this.markAsChanged("email");
             this._email = email;
+        }
+    }
+    
+    public void setRegisteredAt(Date registeredAt) {
+        if (registeredAt != null && !this._registeredAt.equals(registeredAt)) {
+            this._registeredAt = registeredAt;
+            this.markAsChanged("registeredAt");
         }
     }
     
