@@ -56,6 +56,7 @@ public class listAction extends CommandAction {
         for (User user : users.subList(startIndex, endIndex)) {
             sb.append("Name: ")
                     .append(user.getUsername())
+                    .append("\t")
                     .append(" eMail: ");
             if (user.getEmail().isEmpty())
                 sb.append("none");                
