@@ -1,7 +1,6 @@
 package peaceman.peacecontrol.user;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import peaceman.peacecontrol.DataObject;
 import peaceman.peacecontrol.PeaceControl;
@@ -21,6 +20,10 @@ public class User extends DataObject {
     private LinkedList<Session> sessions;
     
     private SessionMapper sessionMapper;
+    
+    public User(SessionMapper sessionMapper) {
+        this.sessionMapper = sessionMapper;
+    }
     
     public String getUsername() {
         return this._username;
@@ -86,11 +89,15 @@ public class User extends DataObject {
 
     public Session getRegisterSession() {
         LinkedList<Session> sessions = this.getSessions();
+        if (sessions.isEmpty())
+            return null;
         return sessions.getFirst();
     }
 
     public Session getLastSession() {
         LinkedList<Session> sessions = this.getSessions();
+        if (sessions.isEmpty())
+            return null;
         return sessions.getLast();
     }
 }

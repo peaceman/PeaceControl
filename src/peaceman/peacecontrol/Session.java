@@ -16,6 +16,10 @@ public class Session extends DataObject {
     private long _userId;
     private UserMapper userMapper;
     
+    public Session(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+    
     public Date getStartedAt() {
         return this._startedAt;
     }

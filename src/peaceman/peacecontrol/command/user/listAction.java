@@ -49,7 +49,9 @@ public class listAction extends CommandAction {
         int startIndex = offset;
         int endIndex = offset + this.entriesPerPage;
         if (endIndex >= users.size()) {
-            endIndex = users.size() - 1;
+            endIndex = users.size();
+            if (endIndex < 0)
+                endIndex = 0;
         }
         for (User user : users.subList(startIndex, endIndex)) {
             sb.append("Name: ")

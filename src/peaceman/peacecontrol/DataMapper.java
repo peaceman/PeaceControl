@@ -25,10 +25,12 @@ public abstract class DataMapper {
     protected Map<Integer, DataObject> newCache = new HashMap<Integer, DataObject>();
     protected String tableName;
     protected Connection db;
+    protected Factory factory;
     protected Class<? extends DataObject> dataObjectType;
     protected Map<String, PreparedStatement> statements = new HashMap<String, PreparedStatement>();
 
-    public DataMapper(Connection db, String tableName, Class dataObjectType) {
+    public DataMapper(Factory factory, Connection db, String tableName, Class dataObjectType) {
+        this.factory = factory;
         this.db = db;
         this.tableName = tableName;
         this.dataObjectType = dataObjectType;
@@ -227,16 +229,7 @@ public abstract class DataMapper {
         }
     }
 
-    public DataObject getNewDataObject() {
-        DataObject toReturn = null;
-        try {
-            toReturn = this.dataObjectType.getConstructor().newInstance();
-            this.addToNewCache(toReturn);
-        } catch (Exception e) {
-            System.err.println("An error occurred while creating a new dataobject in datamapper class " + this.getClass().getName());
-        }
-        return toReturn;
-    }
+    public abstract DataObject getNewDataObject();
 
     public void delete(DataObject dataObject) {
         if (dataObject.getId() == 0) {

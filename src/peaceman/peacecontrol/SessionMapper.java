@@ -16,8 +16,8 @@ import peaceman.peacecontrol.user.User;
  * @author peaceman
  */
 public class SessionMapper extends DataMapper {
-    public SessionMapper(Connection db) {
-        super(db, "session", Session.class);
+    public SessionMapper(Factory factory, Connection db) {
+        super(factory, db, "session", Session.class);
     }
     
     public List<Session> getSessionsByIp(String ip) {
@@ -42,7 +42,7 @@ public class SessionMapper extends DataMapper {
                 if (this.persistantCache.containsKey(attributes.get("id"))) {
                     tmpObject = (Session)this.persistantCache.get(attributes.get("id"));
                 } else {
-                    tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject = (Session)this.factory.getDataObject("session");
                     tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
                 }
@@ -85,7 +85,7 @@ public class SessionMapper extends DataMapper {
                 if (this.persistantCache.containsKey(attributes.get("id"))) {
                     tmpObject = (Session)this.persistantCache.get(attributes.get("id"));
                 } else {
-                    tmpObject = (Session)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject = (Session)this.factory.getDataObject("session");
                     tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
                 }
@@ -102,7 +102,7 @@ public class SessionMapper extends DataMapper {
         return toReturn;
     }
     
-    protected PreparedStatement preparedStatement(String name) {
+    protected PreparedStatement prepareStatement(String name) {
         boolean found = false;
         StringBuilder sb = new StringBuilder();
         
@@ -157,4 +157,15 @@ public class SessionMapper extends DataMapper {
             return super.prepareStatement(name);
         }        
     }
+    
+    public Session getNewDataObject() {
+        Session toReturn = null;
+        try {
+            toReturn = (Session)this.factory.getDataObject("session");
+            this.addToNewCache(toReturn);
+        } catch (Exception e) {
+            System.err.println("An error occurred while creating a new dataobject in datamapper class " + this.getClass().getName());
+        }
+        return toReturn;
+    }    
 }

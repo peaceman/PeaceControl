@@ -13,13 +13,17 @@ import peaceman.peacecontrol.user.User;
 public class UserManager {
     private UserMapper userMapper;
     private Map<Integer, User> loggedInUsers = new HashMap<Integer, User>();
+    private PeaceControl plugin;
     
-    public UserManager(UserMapper userMapper) {
+    public UserManager(PeaceControl plugin, UserMapper userMapper) {
+        this.plugin = plugin;
         this.userMapper = userMapper;
     }
 
     public void loginUser(Player player) {
         User user = this.getUser(player.getName());
+        Session session = this.plugin.sessionManager.createSession(player);
+        session.setUser(user);
         this.loggedInUsers.put(player.getEntityId(), user);
     }
     

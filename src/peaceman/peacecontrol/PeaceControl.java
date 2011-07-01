@@ -5,14 +5,12 @@ import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import peaceman.peacecontrol.command.CommandBase;
-import peaceman.peacecontrol.user.User;
 
 /**
  *
@@ -23,6 +21,8 @@ public class PeaceControl extends JavaPlugin {
     public final static double version = 0.1;
     public final MyLogger log = new MyLogger();
     public UserManager userManager;
+    public SessionManager sessionManager;
+    private Factory factory;
 
     @Override
     public void onEnable() {        
@@ -30,7 +30,10 @@ public class PeaceControl extends JavaPlugin {
             Class.forName("com.mysql.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/peacecontrol?zeroDateTimeBehavior=convertToNull";
             Connection con = DriverManager.getConnection(url, "root", "loladin");
-            this.userManager = new UserManager(new UserMapper(con));
+            this.factory = new Factory(con);
+            
+            this.userManager = new UserManager(this, (UserMapper)this.factory.getDataMapper("user"));
+            this.sessionManager = new SessionManager((SessionMapper)this.factory.getDataMapper("session"));
             
             this.log.info("PeaceControl v" + PeaceControl.version + " has been enabled.");
         } catch (SQLException ex) {
@@ -61,21 +64,7 @@ public class PeaceControl extends JavaPlugin {
     }
 
     public static void main(String[] args) {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://localhost:3306/pc?zeroDateTimeBehavior=convertToNull";
-            Connection con = DriverManager.getConnection(url, "root", "loladin");
 
-            UserMapper userMapper = new UserMapper(con);
-            UserManager userManager = new UserManager(userMapper);
-            
-            userManager.createUser("peaceman", "loladin", null);
-
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(PeaceControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     public static String genMd5(String toHash) {

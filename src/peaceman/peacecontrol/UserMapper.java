@@ -19,8 +19,8 @@ import peaceman.peacecontrol.user.User;
  */
 public class UserMapper extends DataMapper {
 
-    public UserMapper(Connection db) {
-        super(db, "user", User.class);
+    public UserMapper(Factory factory, Connection db) {
+        super(factory, db, "user", User.class);
     }
 
     public User getByUsername(String username) {
@@ -44,7 +44,7 @@ public class UserMapper extends DataMapper {
                 if (this.persistantCache.containsKey(attributes.get("id"))) {
                     tmpObject = (User)this.persistantCache.get(attributes.get("id"));
                 } else {
-                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject = (User)this.factory.getDataObject("user");
                     tmpObject.publicate(attributes);
                     this.addToPersistantCache(tmpObject);
                 }
@@ -263,7 +263,7 @@ public class UserMapper extends DataMapper {
                 if (this.persistantCache.containsKey(attributes.get("id"))) {
                     tmpObject = (User)this.persistantCache.get(attributes.get("id"));
                 } else {
-                    tmpObject = (User)this.dataObjectType.getConstructor().newInstance();
+                    tmpObject = (User)this.factory.getDataObject("user");
                     tmpObject.publicate(attributes);
                 }
 
@@ -276,6 +276,13 @@ public class UserMapper extends DataMapper {
             e.printStackTrace();
         }
         
+        return toReturn;
+    }
+    
+    public User getNewDataObject() {
+        User toReturn = null;
+        toReturn = (User)this.factory.getDataObject("user");
+        this.addToNewCache(toReturn);
         return toReturn;
     }
 }
